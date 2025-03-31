@@ -177,3 +177,34 @@ resource "aws_instance" "webserver_2" {
     Name = var.instance2_name
   }
 }
+
+resource "aws_db_subnet_group" "rds_subnet_group" {
+  name       = "red_subnet_group"
+  subnet_ids = [aws_subnet.private_subnet_1.id, aws_subnet.private_subnet_2.id]
+
+  tags = {
+    Name = "RDS subnet group"
+  }
+}
+
+resource "aws_db_instance" "mysql_db" {
+  allocated_storage      = 20
+  engine                 = "mysql"
+  engine_version         = "8.0"
+  db_subnet_group_name   = aws_db_subnet_group.rds_subnet_group.id
+  db_name                = "mysql_db"
+  instance_class         = var.db_instance_class
+  identifier             = "mysql-db"
+  username               = var.db_username
+  password               = var.db_password
+  port                   = "3306"
+  vpc_security_group_ids = [aws_security_group.rds_sg.id]
+  skip_final_snapshot    = true
+  availability_zone      = var.az1
+  storage_encrypted      = true
+  deletion_protection    = false
+
+  tags = {
+    name = "mysql_db"
+  }
+}
