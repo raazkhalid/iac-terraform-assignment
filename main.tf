@@ -105,3 +105,75 @@ resource "aws_route_table_association" "rta_private_2" {
   subnet_id      = aws_subnet.private_subnet_2.id
   route_table_id = aws_route_table.route_table_private.id
 }
+
+# Security Group for Webservers
+resource "aws_security_group" "webserver_sg" {
+  vpc_id      = aws_vpc.main_vpc.id
+  name        = "webserver_sg"
+  description = "Security group for EC2 instances"
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# Security Group for RDS
+resource "aws_security_group" "rds_sg" {
+  vpc_id      = aws_vpc.main_vpc.id
+  name        = "rds_sg"
+  description = "Security group for RDS"
+
+  ingress {
+    from_port       = 3306
+    to_port         = 3306
+    protocol        = "tcp"
+    security_groups = [aws_security_group.webserver_sg.id]
+  }
+}
+
+# Get latest Amazon Linux AMI
+data "aws_ami" "amazon_linux_latest" {
+  most_recent = true
+  owners      = ["amazon"]
+  filter {
+    name   = "name"
+    values = ["amzn-ami-*-x86_64-gp2"]
+  }
+  filter {
+    name   = "virtualization_type"
+    values = ["hvm"]
+  }
+}
+
+# Webserver EC2 instance 1
+resource "aws_instance" "webserver_1" {
+  ami                         = data.aws_ami.amazon_linux_latest.id
+  instance_type               = var.instance_type
+  subnet_id                   = aws_subnet.public_subnet_1.id
+  vpc_security_group_ids      = [aws_security_group.webserver_sg.id]
+  user_data                   = file("user-data.sh")
+  user_data_replace_on_change = true
+  associate_public_ip_address = true
+
+  tags = {
+    Name = var.instance1_name
+  }
+}
+
+# Webserver EC2 instance 2
+resource "aws_instance" "webserver_2" {
+  ami                         = data.aws_ami.amazon_linux_latest.id
+  instance_type               = var.instance_type
+  subnet_id                   = aws_subnet.public_subnet_2.id
+  vpc_security_group_ids      = [aws_security_group.webserver_sg.id]
+  user_data                   = file("user-data.sh")
+  user_data_replace_on_change = true
+  associate_public_ip_address = true
+
+  tags = {
+    Name = var.instance2_name
+  }
+}
