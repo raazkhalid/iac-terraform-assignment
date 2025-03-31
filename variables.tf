@@ -25,11 +25,13 @@ variable "instance_type" {
 variable "instance1_name" {
   description = "Name for EC2 instance 1"
   type        = string
+  default = "instance1"
 }
 
 variable "instance2_name" {
   description = "Name for EC2 instance 2"
   type        = string
+  default = "instance2"
 }
 
 variable "vpc_cidr_block" {
