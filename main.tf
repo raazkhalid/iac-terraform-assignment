@@ -134,17 +134,19 @@ resource "aws_security_group" "rds_sg" {
   }
 }
 
-# Get latest Amazon Linux AMI
+# Get latest Amazon Linux 2 AMI
 data "aws_ami" "amazon_linux_latest" {
   most_recent = true
   owners      = ["amazon"]
+
   filter {
     name   = "name"
-    values = ["amzn-ami-*-x86_64-gp2"]
+    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
   }
+
   filter {
-    name   = "virtualization_type"
-    values = ["hvm"]
+    name   = "state"
+    values = ["available"]
   }
 }
 

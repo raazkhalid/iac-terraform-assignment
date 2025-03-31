@@ -1,3 +1,15 @@
+variable "aws_access_key" {
+  description = "AWS access key"
+  type        = string
+  sensitive   = true
+}
+
+variable "aws_secret_key" {
+  description = "AWS secret key"
+  type        = string
+  sensitive   = true
+}
+
 variable "region" {
   description = "AWS region"
   type        = string
@@ -23,7 +35,7 @@ variable "instance2_name" {
 variable "vpc_cidr_block" {
   description = "CIDR block for VPC"
   type        = string
-  default     = "10.0.0.0.16"
+  default     = "10.0.0.0/16"
 }
 
 variable "az1" {
